@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useGame } from '@/context/GameContext'
-import { Skull, Clock, Coins, Play, Gift, Swords, TrendingUp, Trophy, Flame, Lock } from 'lucide-react'
+import { Clock, Coins, Play, Gift, Swords, TrendingUp, Trophy, Flame, Lock } from 'lucide-react'
 
 interface BettingSidebarProps {
   onOpenFreeBet: () => void
@@ -64,60 +64,49 @@ export function BettingSidebar({ onOpenFreeBet, onOpenGambling }: BettingSidebar
     : ''
 
   return (
-    <div className="w-80 bg-void/90 backdrop-blur-xl border border-void-border flex flex-col gap-0 max-h-full overflow-y-auto shadow-[0_0_30px_rgba(0,0,0,0.8)] font-display uppercase tracking-wider relative">
-      {/* Glitch accent line */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-blood-glow opacity-50" />
-
-      {/* ── Header ── */}
-      <div className="px-5 py-4 flex items-center justify-between border-b border-void-border bg-void-light/50">
-        <div className="flex items-center gap-2">
-          <Skull className="w-4 h-4 text-blood-glow" />
-          <h2 className="text-white font-bold text-sm tracking-[0.2em]">STATUS</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-horror-muted">ROUND</span>
-          <span className="text-xs font-mono text-blood-glow bg-blood-dark/30 border border-blood/30 px-2 py-0.5">#{currentRound}</span>
+    <div className="w-80 bg-white border-[3px] border-ink shadow-doodle-lg flex flex-col max-h-full overflow-y-auto custom-scrollbar relative">
+      <div className="px-4 pt-4 pb-3 border-b-[3px] border-ink bg-white relative">
+        <div className="flex items-center justify-between">
+          <h2 className="font-bang text-2xl text-ink tracking-wider leading-none">STATUS</h2>
+          <span className="stamp text-ink text-xs">RND #{currentRound}</span>
         </div>
       </div>
 
-      {/* ── Phase Status ── */}
-      <div className="px-5 py-4 border-b border-void-border bg-void-light/20">
+      {/* phase panel */}
+      <div className="px-4 py-4 border-b-[3px] border-ink">
         {gamePhase === 'betting' && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white font-bold text-xs tracking-widest animate-pulse-slow">BETTING OPEN</span>
-              <span className={`font-mono font-bold text-lg tracking-wider ${
-                roundTimeRemaining < 15 ? 'text-blood-glow animate-glitch' : 'text-horror-text'
-              }`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bang text-ink text-lg tracking-wider">BETS OPEN</span>
+              <span className={`font-bang text-2xl ${roundTimeRemaining < 15 ? 'jitter-text' : ''} text-ink`}>
                 {formatTime(roundTimeRemaining)}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-horror-accent" />
-              <span className="text-[10px] text-horror-muted font-mono lowercase">Killer is selecting target...</span>
-            </div>
+            <p className="text-ink/70 font-hand text-sm flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" /> unc is pickin&apos; a room...
+            </p>
           </div>
         )}
         {gamePhase === 'knocking' && (
           <div>
-            <span className="text-blood-glow font-bold text-xs tracking-widest">KILLERS APPROACH</span>
+            <span className="font-bang text-ink text-lg tracking-wider jitter-text">UNC IS KNOCKIN&apos;</span>
             <div className="mt-2 space-y-1">
               {knockedRoom1Name && (
                 <motion.p
-                  className="text-xs text-white font-mono"
-                  animate={{ opacity: [1, 0.4, 1] }}
+                  className="font-hand text-sm text-ink"
+                  animate={{ opacity: [1, 0.45, 1] }}
                   transition={{ duration: 0.5, repeat: Infinity }}
                 >
-                  [ K1: {knockedRoom1Name} ]
+                  → {knockedRoom1Name}
                 </motion.p>
               )}
               {knockedRoom2Name && (
                 <motion.p
-                  className="text-xs text-white font-mono"
-                  animate={{ opacity: [1, 0.4, 1] }}
+                  className="font-hand text-sm text-ink"
+                  animate={{ opacity: [1, 0.45, 1] }}
                   transition={{ duration: 0.5, repeat: Infinity, delay: 0.25 }}
                 >
-                  [ K2: {knockedRoom2Name} ]
+                  → {knockedRoom2Name}
                 </motion.p>
               )}
             </div>
@@ -127,149 +116,134 @@ export function BettingSidebar({ onOpenFreeBet, onOpenGambling }: BettingSidebar
           <div>
             {killStep < killSequence.length - 1 ? (
               <>
-                <span className="text-blood-glow font-bold text-xs tracking-widest animate-glitch">ROOM BY ROOM...</span>
+                <span className="font-bang text-ink text-lg tracking-wider jitter-text">ROOM BY ROOM</span>
                 <motion.p
-                  className="text-sm text-blood mt-2 font-mono font-bold"
+                  className="font-bang text-xl text-ink mt-1"
                   key={killStep}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
                 >
-                  KILL {Math.min(killStep + 1, killSequence.length)}/{killSequence.length}
+                  NGMI {Math.min(killStep + 1, killSequence.length)}/{killSequence.length}
                 </motion.p>
-                <p className="text-[10px] text-horror-muted mt-1 font-mono">
-                  {rooms.find(r => r.id === killSequence[killStep]?.roomId)?.name || '...'} — BREACHED
+                <p className="font-hand text-sm text-ink/70">
+                  {rooms.find(r => r.id === killSequence[killStep]?.roomId)?.name || '...'} — REKT
                 </p>
               </>
             ) : (
               <>
                 <motion.span
-                  className="text-blood-glow font-bold text-xs tracking-widest block"
-                  animate={{ opacity: [1, 0.3, 1], scale: [1, 1.02, 1] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
+                  className="font-bang text-ink text-lg tracking-wider block"
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity }}
                 >
                   ☠ FINAL KILL ☠
                 </motion.span>
                 <motion.p
-                  className="text-sm text-blood mt-2 font-mono font-bold"
-                  animate={{ scale: [1, 1.08, 1], textShadow: ["0 0 0px #ff1a1a", "0 0 15px #ff1a1a", "0 0 0px #ff1a1a"] }}
+                  className="font-bang text-xl text-ink mt-1"
+                  animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 0.4, repeat: Infinity }}
                 >
-                  BOTH KILLERS CONVERGE
+                  BOTH UNCS CONVERGE
                 </motion.p>
-                <p className="text-[10px] text-horror-muted mt-1 font-mono">2 ROOMS LEFT — 1 MUST DIE</p>
+                <p className="font-hand text-sm text-ink/70">2 rooms left — only 1 gmi</p>
               </>
             )}
           </div>
         )}
         {gamePhase === 'result' && (
-          <span className="text-horror-muted font-bold text-xs tracking-widest">CARNAGE CONCLUDED</span>
+          <span className="font-bang text-xl text-ink tracking-wider">COPE ROUND OVER</span>
         )}
       </div>
 
-      {/* ── Betting Buttons (only during betting phase) ── */}
+      {/* betting buttons */}
       {gamePhase === 'betting' ? (
-        <div className="px-5 py-5 space-y-4 border-b border-void-border">
-          {/* Free Prediction */}
+        <div className="px-4 py-4 space-y-3 border-b-[3px] border-ink">
           <button
             onClick={onOpenFreeBet}
             disabled={alreadyFreeBet}
-            className={`w-full p-4 text-left transition-all duration-300 border relative overflow-hidden group ${
+            className={`w-full p-3 text-left border-[3px] border-ink transition-all group relative ${
               alreadyFreeBet
-                ? 'border-void-border bg-void opacity-50 cursor-not-allowed'
-                : 'border-blood/40 bg-void-light hover:border-blood-glow hover:bg-blood-dark/20 cursor-pointer hover:shadow-[0_0_15px_rgba(138,3,3,0.3)]'
+                ? 'bg-paper opacity-60 cursor-not-allowed'
+                : 'bg-white shadow-doodle hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-doodle-lg hover:bg-ink hover:text-white cursor-pointer'
             }`}
           >
-            {!alreadyFreeBet && (
-              <div className="absolute top-0 left-0 w-1 h-full bg-blood-glow transform origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300" />
-            )}
-            <div className="flex items-center gap-4">
-              <div className={`w-10 h-10 flex items-center justify-center border ${alreadyFreeBet ? 'border-void-border bg-void text-horror-muted' : 'border-blood/50 bg-blood-dark/30 text-blood-glow group-hover:scale-110 transition-transform'}`}>
-                <Gift className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 border-2 border-ink bg-white flex items-center justify-center group-hover:bg-white">
+                <Gift className="w-5 h-5 text-ink" />
               </div>
               <div className="flex-1">
-                <p className={`font-bold text-xs tracking-wider ${alreadyFreeBet ? 'text-horror-muted' : 'text-white'}`}>
-                  {alreadyFreeBet ? 'PREDICTION LOGGED' : 'FREE GUESS'}
+                <p className="font-bang text-lg leading-none">
+                  {alreadyFreeBet ? 'COPE LOGGED' : 'FREE GUESS'}
                 </p>
-                <p className={`text-[9px] font-mono lowercase tracking-wide mt-1 ${alreadyFreeBet ? 'text-void-border' : 'text-horror-muted'}`}>
-                  {alreadyFreeBet ? 'awaiting blood' : 'pick the surviving room for 0.01 sol dev buy'}
+                <p className="font-hand text-xs mt-0.5 opacity-80">
+                  {alreadyFreeBet ? 'wait for the reveal' : 'pick who survives, get 0.01 SOL devbuy'}
                 </p>
               </div>
-              {!alreadyFreeBet && (
-                <span className="text-blood-glow text-[10px] font-bold border border-blood-glow/30 px-2 py-1 font-mono">FREE</span>
-              )}
+              {!alreadyFreeBet && <span className="stamp text-xs">FREE</span>}
             </div>
           </button>
 
-          {/* PvP Gambling */}
           <button
             onClick={onOpenGambling}
-            className="w-full p-4 text-left transition-all duration-300 border border-void-border bg-void hover:border-white/30 hover:bg-void-light cursor-pointer relative overflow-hidden group hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+            className="group w-full p-3 text-left border-[3px] border-ink bg-white shadow-doodle hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-doodle-lg hover:bg-ink hover:text-white cursor-pointer transition-all"
           >
-            <div className="absolute top-0 left-0 w-1 h-full bg-white transform origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300" />
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 border border-void-border bg-void-light flex items-center justify-center text-white group-hover:scale-110 transition-transform">
-                <Swords className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 border-2 border-ink bg-white flex items-center justify-center">
+                <Swords className="w-5 h-5 text-ink" />
               </div>
               <div className="flex-1">
-                <p className="font-bold text-xs text-white tracking-wider">WAGER SOUL</p>
-                <p className="text-[9px] text-horror-muted font-mono lowercase tracking-wide mt-1">Bet sol against others</p>
+                <p className="font-bang text-lg leading-none">APE SOL</p>
+                <p className="font-hand text-xs mt-0.5 opacity-80">bet SOL against other copers</p>
               </div>
-              <span className="text-white text-[10px] font-bold border border-white/20 px-2 py-1 font-mono">SOL</span>
+              <span className="stamp text-xs">SOL</span>
             </div>
           </button>
         </div>
       ) : (
-        /* ── ROUND IN PROGRESS ── */
-        <div className="px-5 py-5 border-b border-void-border bg-void-light/10">
-          <div className="border border-blood-dark bg-void p-5 flex flex-col items-center gap-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
-            <div className="w-12 h-12 border border-blood/30 bg-blood-dark/20 flex items-center justify-center">
-              <Lock className="w-5 h-5 text-blood-glow" />
-            </div>
-            <div>
-              <p className="text-white font-bold text-xs tracking-widest uppercase">
-                {gamePhase === 'knocking' && 'HUNT IN PROGRESS'}
-                {gamePhase === 'killing' && 'FATAL BLOW'}
-                {gamePhase === 'result' && 'AFTERMATH'}
-              </p>
-              <p className="text-horror-muted text-[10px] mt-2 font-mono lowercase tracking-widest">
-                Doors are locked
-              </p>
-            </div>
+        <div className="px-4 py-4 border-b-[3px] border-ink">
+          <div className="border-[3px] border-ink bg-white p-4 flex flex-col items-center gap-2 text-center">
+            <Lock className="w-7 h-7 text-ink" />
+            <p className="font-bang text-xl text-ink leading-none">
+              {gamePhase === 'knocking' && 'DOORS LOCKED'}
+              {gamePhase === 'killing' && 'UNC IS COOKIN'}
+              {gamePhase === 'result' && 'AFTERMATH'}
+            </p>
+            <p className="font-hand text-sm text-ink/70">
+              no more bets. cope.
+            </p>
             <motion.div
-              className="w-full py-2 border border-void-border bg-void-light/50 mt-2"
-              animate={{ opacity: [0.3, 1, 0.3] }}
+              className="w-full py-2 border-[2px] border-ink bg-white mt-1"
+              animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <p className="text-horror-accent text-[10px] font-mono font-bold tracking-[0.2em] uppercase">
-                {gamePhase === 'result' ? 'PREPARING NEXT ROUND' : 'OBSERVE THE CARNAGE'}
+              <p className="font-bang text-ink text-sm tracking-wide">
+                {gamePhase === 'result' ? 'NEXT ROUND SOON' : 'WATCH THE CARNAGE'}
               </p>
             </motion.div>
           </div>
         </div>
       )}
 
-      {/* ── Pot Display ── */}
+      {/* pot display */}
       {totalPot > 0 && (
-        <div className="px-5 py-4 border-b border-void-border bg-[linear-gradient(to_right,rgba(138,3,3,0.1),transparent)]">
+        <div className="px-4 py-3 border-b-[3px] border-ink bg-white">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Coins className="w-4 h-4 text-white" />
-              <span className="text-horror-muted text-[10px] font-mono tracking-widest">BLOOD POOL</span>
+            <div className="flex items-center gap-2">
+              <Coins className="w-5 h-5 text-ink" />
+              <span className="font-bang text-ink text-sm tracking-wider">COPE POOL</span>
             </div>
-            <span className="text-white font-bold font-mono text-sm tracking-wider">{totalPot.toFixed(2)} SOL</span>
+            <span className="font-bang text-ink text-xl leading-none">{totalPot.toFixed(2)} SOL</span>
           </div>
         </div>
       )}
 
-      {/* ── Room Leaderboard ── */}
-      <div className="px-5 py-4 flex-1 overflow-hidden flex flex-col">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-3.5 h-3.5 text-horror-accent" />
-          <span className="text-horror-muted text-[10px] font-mono tracking-[0.2em] uppercase">ROOMS</span>
+      {/* room leaderboard */}
+      <div className="px-4 py-4 flex-1 overflow-hidden flex flex-col border-b-[3px] border-ink">
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="w-4 h-4 text-ink" />
+          <span className="font-bang text-ink text-sm tracking-wider">ROOMS</span>
         </div>
-        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
           {bettableRooms.map(room => {
             const gamblingTotal = getTotalGamblingBetsForRoom(room.id)
             const freeCount = getFreeBetCountForRoom(room.id)
@@ -280,40 +254,36 @@ export function BettingSidebar({ onOpenFreeBet, onOpenGambling }: BettingSidebar
             return (
               <div
                 key={room.id}
-                className={`relative px-4 py-3 border transition-all duration-300 group ${
+                className={`relative px-3 py-2 border-[2px] border-ink transition-all ${
                   isSurvivor
-                    ? 'border-green-500 bg-green-900/20 shadow-[inset_0_0_15px_rgba(0,255,100,0.15)]'
+                    ? 'bg-ink text-white'
                     : isKillTarget
-                    ? 'border-blood-glow bg-blood-dark/30 shadow-[inset_0_0_15px_rgba(255,26,26,0.2)]'
-                    : 'border-void-border bg-void-light/50 hover:bg-void-light hover:border-white/20'
+                    ? 'bg-ink text-white line-through opacity-70'
+                    : 'bg-white hover:bg-paper'
                 }`}
               >
-                {isKillTarget && (
-                  <div className="absolute top-0 right-0 w-full h-full bg-[url('/noise.png')] opacity-20 pointer-events-none" />
-                )}
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 flex items-center justify-center text-[10px] font-bold font-mono border ${
-                      isSurvivor ? 'border-green-500 text-green-400 bg-green-900/30'
-                      : isKillTarget ? 'border-blood-glow text-blood-glow bg-blood-dark' : 'border-void-border text-horror-muted bg-void'
-                    }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-6 h-6 flex items-center justify-center text-xs font-bang border-2 border-ink ${isSurvivor || isKillTarget ? 'bg-white text-ink' : 'bg-white text-ink'}`}>
                       {room.id}
                     </span>
-                    <span className={`text-[11px] font-bold tracking-wider ${isSurvivor ? 'text-green-400' : isKillTarget ? 'text-white' : 'text-horror-text'}`}>
+                    <span className="font-bang text-sm tracking-wider">
                       {room.name}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {freeCount > 0 && (
-                      <span className="text-[10px] text-horror-muted font-mono flex items-center gap-1">
-                        {freeCount}<Skull className="w-2.5 h-2.5" />
+                      <span className="font-hand text-xs opacity-80">
+                        {freeCount} 😭
                       </span>
                     )}
-                    <span className={`text-[11px] font-mono ${isSurvivor ? 'text-green-400' : isKillTarget ? 'text-blood-glow' : 'text-white'}`}>
+                    <span className="font-bang text-xs">
                       {gamblingTotal > 0 ? `${gamblingTotal.toFixed(2)}` : '—'}
                     </span>
                     {totalPot > 0 && gamblingTotal > 0 && (
-                      <span className="text-[9px] text-horror-muted font-mono w-6 text-right">{pctOfPot}%</span>
+                      <span className="font-mono text-[10px] w-6 text-right opacity-60">
+                        {pctOfPot}%
+                      </span>
                     )}
                   </div>
                 </div>
@@ -323,92 +293,81 @@ export function BettingSidebar({ onOpenFreeBet, onOpenGambling }: BettingSidebar
         </div>
       </div>
 
-      {/* ── Round Result ── */}
       {gamePhase === 'result' && roundResult && (
-        <div className="px-5 py-5 border-t border-blood-dark bg-void-light relative">
-          <div className="absolute inset-0 bg-blood-glow opacity-[0.02] pointer-events-none" />
-          <div className="border border-void-border bg-void p-4 space-y-4 relative z-10">
-            <p className="text-horror-text text-[10px] font-mono uppercase tracking-widest text-center border-b border-void-border pb-3">
-              SOLE SURVIVOR: <br/><strong className="text-green-400 text-xs mt-1 block animate-pulse" style={{ textShadow: '0 0 8px #00ff66' }}>{survivingRoomName}</strong>
-              <span className="text-blood-glow text-[9px] block mt-1">{roundResult.killedRooms.length} ROOMS MASSACRED</span>
-            </p>
+        <div className="px-4 py-4 border-b-[3px] border-ink bg-white">
+          <div className="border-[3px] border-ink bg-white p-3 space-y-3">
+            <div className="text-center border-b-2 border-ink pb-2">
+              <p className="font-hand text-sm text-ink/70">GMI ROOM:</p>
+              <p className="font-bang text-2xl text-ink tracking-wider leading-none">{survivingRoomName}</p>
+              <p className="font-hand text-xs text-ink/70 mt-1">{roundResult.killedRooms.length} rooms REKT</p>
+            </div>
 
-            {/* Free bet results */}
             {roundResult.correctFreeBets.length > 0 && (
-              <div className="bg-void-light border border-white/10 p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Skull className="w-3.5 h-3.5 text-white" />
-                  <span className="text-white text-[10px] font-bold tracking-widest uppercase">
-                    {roundResult.correctFreeBets.length} SURVIVED
-                  </span>
-                </div>
-                <p className="text-horror-muted text-[9px] font-mono lowercase">
-                  {(roundResult.correctFreeBets.length * 0.01).toFixed(2)} SOL devbuy triggered
+              <div className="border-2 border-ink bg-white p-2">
+                <p className="font-bang text-ink text-sm tracking-wide">
+                  {roundResult.correctFreeBets.length} FREE WINNERS
+                </p>
+                <p className="font-hand text-xs text-ink/70">
+                  {(roundResult.correctFreeBets.length * 0.01).toFixed(2)} SOL devbuy incoming
                 </p>
               </div>
             )}
 
-            {/* Gambling results */}
             {roundResult.totalPot > 0 && (
               <>
                 {roundResult.winnersExist ? (
-                  <div className="bg-void-light border border-white/10 p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Trophy className="w-3.5 h-3.5 text-white" />
-                      <span className="text-white text-[10px] font-bold tracking-widest uppercase">
-                        SPOILS OF WAR ({roundResult.payouts.length})
-                      </span>
+                  <div className="border-2 border-ink bg-white p-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Trophy className="w-4 h-4 text-ink" />
+                      <span className="font-bang text-ink text-sm">GMI CHADS ({roundResult.payouts.length})</span>
                     </div>
-                    <div className="space-y-1.5 mt-2">
+                    <div className="space-y-1">
                       {roundResult.payouts.slice(0, 5).map((p, i) => (
-                        <div key={i} className="flex justify-between text-[10px] font-mono border-b border-void-border pb-1 last:border-0 last:pb-0">
-                          <span className="text-horror-muted">{p.wallet.slice(0, 4)}...{p.wallet.slice(-4)}</span>
-                          <span className="text-white">+{p.amount.toFixed(3)} SOL</span>
+                        <div key={i} className="flex justify-between font-mono text-xs">
+                          <span className="text-ink/70">{p.wallet.slice(0, 4)}…{p.wallet.slice(-4)}</span>
+                          <span className="text-ink font-bold">+{p.amount.toFixed(3)}</span>
                         </div>
                       ))}
                       {roundResult.payouts.length > 5 && (
-                        <p className="text-[9px] text-horror-muted font-mono pt-1">+{roundResult.payouts.length - 5} more</p>
+                        <p className="font-hand text-xs text-ink/70 pt-1">+{roundResult.payouts.length - 5} more…</p>
                       )}
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-blood-dark/20 border border-blood/30 p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Flame className="w-3.5 h-3.5 text-blood-glow" />
-                      <span className="text-blood-glow text-[10px] font-bold tracking-widest uppercase">NO SURVIVORS</span>
+                  <div className="border-2 border-ink bg-ink text-white p-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Flame className="w-4 h-4" />
+                      <span className="font-bang text-sm">NOBODY SURVIVED</span>
                     </div>
-                    <p className="text-horror-muted text-[9px] font-mono lowercase">
-                      {roundResult.totalPot.toFixed(2)} SOL to devbuy
+                    <p className="font-hand text-xs">
+                      {roundResult.totalPot.toFixed(2)} SOL → devbuy
                     </p>
                   </div>
                 )}
               </>
             )}
 
-            {/* Total devbuy */}
             {roundResult.devBuyAmount > 0 && (
-              <div className="flex items-center justify-between bg-void border border-blood-dark px-3 py-2">
-                <span className="text-horror-muted text-[9px] font-mono tracking-widest uppercase">TOTAL BLOOD MONEY</span>
-                <span className="text-blood-glow text-[11px] font-bold font-mono">{roundResult.devBuyAmount.toFixed(3)} SOL</span>
+              <div className="flex items-center justify-between border-2 border-ink bg-white px-2 py-1">
+                <span className="font-hand text-xs text-ink/70">TOTAL COPE $$$</span>
+                <span className="font-bang text-ink text-sm">{roundResult.devBuyAmount.toFixed(3)} SOL</span>
               </div>
             )}
 
-            {/* Auto-restart indicator */}
-            <div className="w-full py-3 border border-void-border font-bold text-[10px] tracking-[0.2em] bg-void text-horror-muted flex items-center justify-center gap-2 uppercase">
-              <Play className="w-3 h-3 text-white animate-pulse" />
-              NEXT NIGHTMARE
+            <div className="w-full py-2 border-2 border-ink bg-white font-bang text-ink text-sm text-center flex items-center justify-center gap-2">
+              <Play className="w-3.5 h-3.5" />
+              NEXT ROUND SOON
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Footer hint ── */}
-      <div className="px-5 py-3 border-t border-void-border bg-void-light/30">
-        <p className="text-[9px] text-horror-muted font-mono lowercase tracking-wide text-center">
-          {gamePhase === 'betting' && 'Pick the room that survives'}
-          {gamePhase === 'knocking' && 'Silence... they search'}
-          {gamePhase === 'killing' && 'Blood is drawn in 6 rooms'}
-          {gamePhase === 'result' && 'The cycle continues'}
+      <div className="px-4 py-2 bg-white border-t-2 border-ink">
+        <p className="font-hand text-xs text-ink/70 text-center">
+          {gamePhase === 'betting' && 'pick the room that unc skips'}
+          {gamePhase === 'knocking' && "shhh... he's listening"}
+          {gamePhase === 'killing' && '6 rooms fall. 1 makes it.'}
+          {gamePhase === 'result' && 'the cycle never ends'}
         </p>
       </div>
     </div>

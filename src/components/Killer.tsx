@@ -9,202 +9,119 @@ interface KillerProps {
   isKilling?: boolean
 }
 
+const SPRITE_W = 42
+const SPRITE_H = 56
+
 export function Killer({ position, isKnocking = false, isKilling = false }: KillerProps) {
   return (
     <motion.g
       initial={{ x: position.x, y: position.y }}
       animate={{ x: position.x, y: position.y }}
-      transition={{ 
+      transition={{
         type: 'spring',
         stiffness: 40,
         damping: 12,
-        duration: 2
+        duration: 2,
       }}
-      filter="url(#killerGlow)"
     >
-      {/* Knocking ring pulse */}
       {isKnocking && (
         <>
-          <motion.circle
-            cx={0} cy={0} r={8}
-            fill="none" stroke="#ff4444" strokeWidth={1.5}
-            initial={{ r: 8, opacity: 0.8 }}
-            animate={{ r: 30, opacity: 0 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'easeOut' }}
-          />
-          <motion.circle
-            cx={0} cy={0} r={8}
-            fill="none" stroke="#ff4444" strokeWidth={1}
-            initial={{ r: 8, opacity: 0.6 }}
-            animate={{ r: 25, opacity: 0 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'easeOut', delay: 0.3 }}
-          />
-          {/* KNOCK text */}
           <motion.text
-            x={0} y={-30}
+            x={0} y={-SPRITE_H / 2 - 14}
             textAnchor="middle"
-            fill="#ff4444"
-            fontSize="8"
-            fontFamily="monospace"
+            fill="#0d0d0d"
+            fontSize="11"
+            fontFamily="var(--font-bang), Impact"
             fontWeight="bold"
-            animate={{ opacity: [1, 0.3, 1], y: [-30, -34, -30] }}
-            transition={{ duration: 0.5, repeat: Infinity }}
+            animate={{ opacity: [1, 0.3, 1], y: [-SPRITE_H / 2 - 14, -SPRITE_H / 2 - 18, -SPRITE_H / 2 - 14], rotate: [-3, 3, -3] }}
+            transition={{ duration: 0.45, repeat: Infinity }}
           >
             KNOCK KNOCK
           </motion.text>
+          <motion.circle
+            cx={0} cy={0} r={SPRITE_W / 2}
+            fill="none" stroke="#0d0d0d" strokeWidth={1.5}
+            initial={{ r: SPRITE_W / 2, opacity: 0.8 }}
+            animate={{ r: SPRITE_W + 10, opacity: 0 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'easeOut' }}
+          />
         </>
       )}
 
-      {/* Kill flash effect */}
       {isKilling && (
         <>
-          {/* Red flash */}
-          <motion.circle
-            cx={0} cy={0} r={5}
-            fill="#ff0000"
-            initial={{ r: 5, opacity: 0.8 }}
-            animate={{ r: 50, opacity: 0 }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: 'easeOut' }}
-          />
-          {/* Slash lines */}
-          {[0, 1, 2].map(i => (
-            <motion.line
-              key={i}
-              x1={-15 + i * 8} y1={-20}
-              x2={15 + i * 8} y2={20}
-              stroke="#ff0000"
-              strokeWidth={2}
-              strokeLinecap="round"
-              initial={{ opacity: 0, pathLength: 0 }}
-              animate={{ opacity: [0, 1, 0], pathLength: [0, 1, 1] }}
-              transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
-            />
-          ))}
-          {/* Blood splatters */}
+          <motion.text
+            x={0} y={-SPRITE_H / 2 - 10}
+            textAnchor="middle"
+            fill="#0d0d0d"
+            fontSize="13"
+            fontFamily="var(--font-bang), Impact"
+            fontWeight="bold"
+            animate={{ scale: [1, 1.2, 1], rotate: [-4, 4, -4] }}
+            transition={{ duration: 0.3, repeat: Infinity }}
+          >
+            NGMI
+          </motion.text>
           {[0, 1, 2, 3, 4, 5].map(i => (
             <motion.circle
               key={`blood-${i}`}
-              cx={Math.cos(i * 1.05) * 15}
+              cx={Math.cos(i * 1.05) * 14}
               cy={Math.sin(i * 1.05) * 12}
-              r={2}
-              fill="#aa0000"
+              r={1.6}
+              fill="#0d0d0d"
               initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.7] }}
-              transition={{ duration: 0.5, delay: 0.5 + i * 0.15 }}
+              animate={{ scale: [0, 1.4, 1], opacity: [0, 1, 0.75] }}
+              transition={{ duration: 0.5, delay: 0.3 + i * 0.1, repeat: Infinity, repeatDelay: 0.2 }}
             />
           ))}
         </>
       )}
 
-      {/* Ghostface body - hooded cloak */}
-      <motion.path
-        d="M 0 -15 
-           C -12 -10 -15 5 -12 20 
-           L -8 25 L 8 25 L 12 20 
-           C 15 5 12 -10 0 -15 Z"
-        fill="#1a1a1a"
-        stroke="#333333"
-        strokeWidth="1"
-        animate={isKilling
-          ? { scale: [1, 1.15, 1.05, 1.15, 1], rotate: [0, -10, 10, -5, 0] }
-          : isKnocking
-          ? { scale: [1, 1.05, 1], x: [0, 3, -3, 0] }
-          : { scale: [1, 1.02, 1] }
+      <motion.image
+        href="/unc.png"
+        x={-SPRITE_W / 2}
+        y={-SPRITE_H / 2}
+        width={SPRITE_W}
+        height={SPRITE_H}
+        preserveAspectRatio="xMidYMid meet"
+        animate={
+          isKilling
+            ? { rotate: [-6, 6, -6], scale: [1, 1.08, 1] }
+            : isKnocking
+            ? { rotate: [-3, 3, -3] }
+            : { y: [-SPRITE_H / 2, -SPRITE_H / 2 - 1.2, -SPRITE_H / 2] }
         }
         transition={{
-          duration: isKilling ? 0.6 : isKnocking ? 0.4 : 2,
+          duration: isKilling ? 0.3 : isKnocking ? 0.35 : 2,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
-      />
-      
-      {/* Ghostface mask */}
-      <motion.ellipse
-        cx="0"
-        cy="-5"
-        rx="8"
-        ry="10"
-        fill="#f5f5f5"
-        stroke="#cccccc"
-        strokeWidth="0.5"
-      />
-      
-      {/* Left eye hole */}
-      <motion.ellipse
-        cx="-3"
-        cy="-7"
-        rx="2"
-        ry="3"
-        fill="#000000"
-        animate={{ ry: isKilling ? [3, 4, 3] : [3, 2.5, 3] }}
-        transition={{ duration: isKilling ? 0.3 : 3, repeat: Infinity, ease: "easeInOut" }}
-      />
-      
-      {/* Right eye hole */}
-      <motion.ellipse
-        cx="3"
-        cy="-7"
-        rx="2"
-        ry="3"
-        fill="#000000"
-        animate={{ ry: isKilling ? [3, 4, 3] : [3, 2.5, 3] }}
-        transition={{ duration: isKilling ? 0.3 : 3, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
-      />
-      
-      {/* Mouth - elongated scream */}
-      <motion.ellipse
-        cx="0"
-        cy="2"
-        rx="3"
-        ry="5"
-        fill="#000000"
-        animate={{ ry: isKilling ? [5, 7, 5] : [5, 6, 5] }}
-        transition={{ duration: isKilling ? 0.4 : 2, repeat: Infinity, ease: "easeInOut" }}
-      />
-      
-      {/* Knife */}
-      <motion.g
-        animate={isKilling
-          ? { rotate: [-20, 60, -20, 60, -20] }
-          : isKnocking
-          ? { rotate: [0, -15, 0] }
-          : { rotate: [-5, 5, -5] }
-        }
-        transition={{
-          duration: isKilling ? 0.5 : isKnocking ? 0.3 : 1.5,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        style={{ transformOrigin: '12px 10px' }}
-      >
-        {/* Knife handle */}
-        <rect x="10" y="5" width="4" height="10" fill="#4a3728" rx="1" />
-        {/* Knife blade */}
-        <path d="M 10 5 L 12 -15 L 14 5 Z" fill="#c0c0c0" stroke="#888888" strokeWidth="0.5" />
-        {/* Blade shine */}
-        <line x1="12" y1="-12" x2="12" y2="2" stroke="#ffffff" strokeWidth="0.5" opacity="0.5" />
-      </motion.g>
-
-      {/* Blood drip effect */}
-      <motion.circle
-        cx="12" cy="-10" r="1" fill="#cc0000"
-        animate={{ cy: [-10, 30], opacity: [1, 0] }}
-        transition={{ duration: isKilling ? 0.5 : 2, repeat: Infinity, ease: "easeIn", delay: isKilling ? 0 : 1 }}
+        style={{ transformOrigin: '0px 0px', transformBox: 'fill-box' }}
       />
 
-      {/* Extra blood drips when killing */}
-      {isKilling && (
-        <>
-          <motion.circle cx="-5" cy="-5" r="1.2" fill="#cc0000"
-            animate={{ cy: [-5, 35], opacity: [1, 0] }}
-            transition={{ duration: 0.7, repeat: Infinity, ease: "easeIn", delay: 0.2 }}
-          />
-          <motion.circle cx="5" cy="-8" r="0.8" fill="#cc0000"
-            animate={{ cy: [-8, 32], opacity: [1, 0] }}
-            transition={{ duration: 0.6, repeat: Infinity, ease: "easeIn", delay: 0.4 }}
-          />
-        </>
-      )}
+      {/* nametag */}
+      <g>
+        <rect
+          x={-10} y={SPRITE_H / 2 + 1}
+          width={20} height={7}
+          fill="#ffffff"
+          stroke="#0d0d0d"
+          strokeWidth="1"
+          transform={`rotate(-2 0 ${SPRITE_H / 2 + 4})`}
+        />
+        <text
+          x={0} y={SPRITE_H / 2 + 6.3}
+          textAnchor="middle"
+          fill="#0d0d0d"
+          fontSize="6"
+          fontFamily="var(--font-bang), Impact"
+          fontWeight="bold"
+          letterSpacing="1"
+          transform={`rotate(-2 0 ${SPRITE_H / 2 + 4})`}
+        >
+          UNC
+        </text>
+      </g>
     </motion.g>
   )
 }

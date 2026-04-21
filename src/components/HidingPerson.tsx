@@ -12,9 +12,16 @@ interface HidingPersonProps {
   isKilled: boolean
 }
 
+const HAIR_VARIANTS = [
+  { d: 'M -5 -11 Q 0 -15 5 -11 L 4 -8 Q 0 -10 -4 -8 Z', color: '#2a1a10' },
+  { d: 'M -5 -12 Q 0 -15 5 -12 L 5 -7 Q 0 -11 -5 -7 Z', color: '#6b3a1a' },
+  { d: 'M -5 -11 Q 0 -14 5 -11 L 5 -8 L -5 -8 Z', color: '#d8b66b' },
+  { d: '', color: 'transparent' },
+  { d: 'M -5 -11 Q 0 -16 5 -11 L 5 -8 Q 0 -9 -5 -8 Z', color: '#1a1a1a' },
+]
+
 export function HidingPerson({ roomX, roomY, roomWidth, roomHeight, personIndex, isKilled }: HidingPersonProps) {
-  // Generate a random walk path within the room bounds (with padding)
-  const pad = 25
+  const pad = 28
   const minX = roomX + pad
   const maxX = roomX + roomWidth - pad
   const minY = roomY + pad
@@ -29,53 +36,51 @@ export function HidingPerson({ roomX, roomY, roomWidth, roomHeight, personIndex,
       xs.push(minX + ((Math.sin(seed + i * 2.1) * 0.5 + 0.5) * (maxX - minX)))
       ys.push(minY + ((Math.cos(seed + i * 3.7) * 0.5 + 0.5) * (maxY - minY)))
     }
-    // Close the loop
     xs.push(xs[0])
     ys.push(ys[0])
     return { xs, ys }
   }, [minX, maxX, minY, maxY, personIndex])
 
-  // Person color based on index
-  const colors = ['#5588cc', '#cc8855', '#55cc88', '#cc55aa', '#88cc55', '#aa55cc']
-  const color = colors[personIndex % colors.length]
+  const hair = HAIR_VARIANTS[personIndex % HAIR_VARIANTS.length]
+  const skinTone = personIndex % 3 === 0 ? '#fbd4bc' : personIndex % 3 === 1 ? '#f4c2a1' : '#e8b090'
 
   if (isKilled) {
-    // Death animation: person falls, blood splatter — use plain SVG to avoid framer-motion attribute bugs
     const bx = walkPath.xs[0]
     const by = walkPath.ys[0]
     return (
       <g>
-        {/* Fallen body */}
-        <g style={{ transformOrigin: `${bx}px ${by}px`, transform: 'rotate(90deg)', opacity: 0.6 }}>
-          <ellipse cx={bx} cy={by} rx={6} ry={4} fill={color} opacity={0.7} />
-          <circle cx={bx - 7} cy={by} r={3} fill="#ddb896" />
+        <g style={{ transformOrigin: `${bx}px ${by}px`, transform: 'rotate(90deg)', opacity: 0.85 }}>
+          <ellipse cx={bx} cy={by} rx={6} ry={4} fill={skinTone} stroke="#0d0d0d" strokeWidth="0.8" />
+          <circle cx={bx - 7} cy={by} r={3.5} fill={skinTone} stroke="#0d0d0d" strokeWidth="0.8" />
         </g>
-
-        {/* Blood pool */}
-        <ellipse cx={bx} cy={by + 2} rx={12} ry={8} fill="#880000" opacity={0.6} />
-
-        {/* Blood splatter dots */}
+        <ellipse cx={bx} cy={by + 2} rx={12} ry={6} fill="#e83333" stroke="#0d0d0d" strokeWidth="0.6" opacity="0.85" />
         {[0, 1, 2, 3].map(i => (
           <circle
             key={i}
-            cx={bx + Math.cos(i * 1.5) * 8}
-            cy={by + Math.sin(i * 1.5) * 6}
-            r={1.5}
-            fill="#aa0000"
-            opacity={0.7}
+            cx={bx + Math.cos(i * 1.5) * 9}
+            cy={by + Math.sin(i * 1.5) * 7}
+            r={1.4}
+            fill="#e83333"
+            stroke="#0d0d0d"
+            strokeWidth="0.4"
           />
         ))}
-
         {/* X eyes */}
-        <g>
-          <line x1={bx - 9} y1={by - 2} x2={bx - 5} y2={by + 2} stroke="#cc0000" strokeWidth="0.8" />
-          <line x1={bx - 5} y1={by - 2} x2={bx - 9} y2={by + 2} stroke="#cc0000" strokeWidth="0.8" />
+        <g stroke="#0d0d0d" strokeWidth="0.9" strokeLinecap="round">
+          <line x1={bx - 10} y1={by - 2} x2={bx - 6} y2={by + 2} />
+          <line x1={bx - 6} y1={by - 2} x2={bx - 10} y2={by + 2} />
+        </g>
+        {/* NGMI tag */}
+        <g transform={`translate(${bx + 14}, ${by - 6}) rotate(-8)`}>
+          <rect x={-10} y={-5} width={20} height={8} fill="#fff8a6" stroke="#0d0d0d" strokeWidth="0.8" />
+          <text x={0} y={1} textAnchor="middle" fill="#e83333" fontSize="6" fontFamily="var(--font-bang), Impact" fontWeight="bold">
+            NGMI
+          </text>
         </g>
       </g>
     )
   }
 
-  // Alive: walking animation inside room using SVG transform
   const startX = walkPath.xs[0]
   const startY = walkPath.ys[0]
 
@@ -87,64 +92,58 @@ export function HidingPerson({ roomX, roomY, roomWidth, roomHeight, personIndex,
         translateY: walkPath.ys,
       }}
       transition={{
-        duration: 8 + personIndex * 2,
+        duration: 10 + personIndex * 2,
         repeat: Infinity,
         ease: 'linear',
       }}
     >
-      {/* Shadow */}
-      <ellipse
-        cx={0}
-        cy={5}
-        rx={4}
-        ry={1.5}
-        fill="rgba(0,0,0,0.3)"
+      {/* shadow */}
+      <ellipse cx={0} cy={11} rx={5} ry={1.3} fill="rgba(13,13,13,0.28)" />
+
+      {/* body / shirt */}
+      <path
+        d="M -5 0 Q -5 -2 -3 -3 L 3 -3 Q 5 -2 5 0 L 5 9 L -5 9 Z"
+        fill={personIndex % 2 === 0 ? '#5a7fb8' : '#c45a5a'}
+        stroke="#0d0d0d"
+        strokeWidth="0.9"
+        strokeLinejoin="round"
       />
 
-      {/* Body */}
-      <ellipse
-        cx={0}
-        cy={0}
-        rx={4}
-        ry={6}
-        fill={color}
+      {/* head */}
+      <circle cx={0} cy={-7} r={4.5} fill={skinTone} stroke="#0d0d0d" strokeWidth="0.9" />
+
+      {/* hair */}
+      {hair.d && <path d={hair.d} fill={hair.color} stroke="#0d0d0d" strokeWidth="0.6" />}
+
+      {/* sad wojak eyes - dots */}
+      <circle cx={-1.6} cy={-7} r={0.7} fill="#0d0d0d" />
+      <circle cx={1.6} cy={-7} r={0.7} fill="#0d0d0d" />
+
+      {/* sad mouth (frown) */}
+      <path d="M -1.8 -4.6 Q 0 -5.6 1.8 -4.6" fill="none" stroke="#0d0d0d" strokeWidth="0.7" strokeLinecap="round" />
+
+      {/* tear */}
+      <motion.ellipse
+        cx={-1.6} cy={-5.2}
+        rx={0.55} ry={0.9}
+        fill="#8fc8f2"
+        stroke="#0d0d0d"
+        strokeWidth="0.3"
+        animate={{ cy: [-5.2, -3, -1], opacity: [1, 1, 0] }}
+        transition={{ duration: 1.4, repeat: Infinity, delay: personIndex * 0.2 }}
       />
 
-      {/* Head */}
-      <circle
-        cx={0}
-        cy={-9}
-        r={3.5}
-        fill="#ddb896"
-        stroke="#c4a07a"
-        strokeWidth={0.3}
-      />
+      {/* blush */}
+      <circle cx={-3} cy={-5.5} r={0.9} fill="#ff7aa4" opacity="0.55" />
+      <circle cx={3} cy={-5.5} r={0.9} fill="#ff7aa4" opacity="0.55" />
 
-      {/* Hair */}
-      <ellipse
-        cx={0}
-        cy={-11}
-        rx={3.5}
-        ry={2}
-        fill={personIndex % 2 === 0 ? '#4a3020' : '#2a1a10'}
-      />
+      {/* arms (hugging knees vibe) */}
+      <line x1={-4} y1={2} x2={-6} y2={7} stroke="#0d0d0d" strokeWidth="0.9" strokeLinecap="round" />
+      <line x1={4} y1={2} x2={6} y2={7} stroke="#0d0d0d" strokeWidth="0.9" strokeLinecap="round" />
 
-      {/* Scared expression (during knocking/killing) */}
-      <circle cx={-1} cy={-9} r={0.6} fill="#333" />
-      <circle cx={1.5} cy={-9} r={0.6} fill="#333" />
-      <ellipse cx={0} cy={-7} rx={1} ry={0.5} fill="#333" />
-
-      {/* Walking legs */}
-      <line
-        x1={-1.5} y1={5}
-        x2={-3} y2={10}
-        stroke={color} strokeWidth={1.5} strokeLinecap="round"
-      />
-      <line
-        x1={1.5} y1={5}
-        x2={3} y2={10}
-        stroke={color} strokeWidth={1.5} strokeLinecap="round"
-      />
+      {/* legs */}
+      <line x1={-2} y1={9} x2={-3} y2={13} stroke="#0d0d0d" strokeWidth="1" strokeLinecap="round" />
+      <line x1={2} y1={9} x2={3} y2={13} stroke="#0d0d0d" strokeWidth="1" strokeLinecap="round" />
     </motion.g>
   )
 }

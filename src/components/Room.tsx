@@ -16,290 +16,231 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
   const freeCount = getFreeBetCountForRoom(room.id)
   const isKillerHere = killerTargetRoom === room.id || killer2TargetRoom === room.id
   const isBeingKnocked = killerKnockingRoom === room.id || killer2KnockingRoom === room.id
-  // Currently being killed RIGHT NOW at this step
   const isActiveKill = gamePhase === 'killing' && isKilling && killStep >= 0 && killStep < killSequence.length && killSequence[killStep]?.roomId === room.id
-  // Already dead from a previous step
   const isAlreadyDead = isRoomKilled(room.id) && !isActiveKill
   const isBeingKilled = isActiveKill
-  // Only show surviving room during result phase (not during killing — keeps it a surprise)
   const isSurviving = survivingRoom === room.id && gamePhase === 'result'
   const canClick = gamePhase === 'betting'
-  
+
   const playersInRoom = playerPositions.filter((p: any) => p.roomId === room.id)
 
   const overlayFill = isSurviving
-    ? 'rgba(0, 255, 100, 0.25)'
+    ? 'rgba(13, 13, 13, 0.06)'
     : isActiveKill
-    ? 'rgba(255, 0, 0, 0.4)'
+    ? 'rgba(232, 51, 51, 0.25)'
     : isAlreadyDead
-    ? 'rgba(80, 0, 0, 0.5)'
+    ? 'rgba(13, 13, 13, 0.18)'
     : isBeingKnocked
-    ? 'rgba(138, 3, 3, 0.2)'
+    ? 'rgba(13, 13, 13, 0.08)'
     : isKillerHere
-    ? 'rgba(255, 26, 26, 0.2)'
+    ? 'rgba(13, 13, 13, 0.04)'
     : isSelected
-    ? 'rgba(255, 255, 255, 0.1)'
-    : 'rgba(5, 5, 5, 0.3)'
+    ? 'rgba(13, 13, 13, 0.06)'
+    : 'transparent'
 
-  const hoverFill = canClick
-    ? 'rgba(255, 255, 255, 0.05)'
-    : overlayFill
+  const hoverFill = canClick ? 'rgba(13, 13, 13, 0.05)' : overlayFill
 
   const borderColor = isSurviving
-    ? '#00ff66'
+    ? '#0d0d0d'
     : isActiveKill
-    ? '#ff0000'
+    ? '#e83333'
     : isAlreadyDead
-    ? '#4a0000'
+    ? '#0d0d0d'
     : isBeingKnocked
-    ? '#8a0303'
+    ? '#0d0d0d'
     : isKillerHere
-    ? '#ff1a1a'
+    ? '#0d0d0d'
     : isSelected
-    ? '#ffffff'
-    : 'rgba(255,255,255,0.08)'
+    ? '#0d0d0d'
+    : 'transparent'
 
   const labelCx = room.x + room.width / 2
-  const labelCy = room.y + room.height / 2
+  const labelY = room.y + room.height - 18
+  const roomNameLen = room.name.length
 
   return (
     <motion.g
       onClick={canClick ? onClick : undefined}
       style={{ cursor: canClick ? 'pointer' : 'default' }}
     >
-      {/* Invisible hitbox */}
       <rect
         x={room.x} y={room.y}
         width={room.width} height={room.height}
         fill="transparent"
       />
 
-      {/* Interactive overlay */}
       <motion.rect
-        x={room.x + 1} y={room.y + 1}
-        width={room.width - 2} height={room.height - 2}
-        rx={0} // Sharp corners for horror
+        x={room.x + 2} y={room.y + 2}
+        width={room.width - 4} height={room.height - 4}
         fill={overlayFill}
         stroke={borderColor}
-        strokeWidth={isSelected || isKillerHere || isBeingKnocked || isBeingKilled ? 1.5 : 0.5}
-        filter={isSelected || isBeingKilled ? 'url(#glow)' : undefined}
+        strokeWidth={isSelected || isKillerHere || isBeingKnocked || isBeingKilled ? 3 : 0}
+        strokeDasharray={isSelected ? '6,4' : '0'}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.3 }}
         whileHover={canClick ? { fill: hoverFill } : undefined}
       />
 
-      {/* Noise overlay on room when selected or targeted */}
-      {(isSelected || isBeingKnocked || isBeingKilled) && (
+      {/* room number tag */}
+      <g transform={`translate(${room.x + 18}, ${room.y + 18}) rotate(-4)`}>
         <rect
-          x={room.x + 1} y={room.y + 1}
-          width={room.width - 2} height={room.height - 2}
-          fill="url(#noiseFilter)"
-          opacity="0.1"
-          style={{ mixBlendMode: 'overlay' }}
-          pointerEvents="none"
-        />
-      )}
-
-      {/* Room number badge */}
-      <g>
-        <rect
-          x={room.x + 8} y={room.y + 8}
-          width={22} height={22} rx={0}
-          fill={isBeingKilled ? '#8a0303' : isBeingKnocked ? '#3e0000' : isKillerHere ? '#cc0000' : isSelected ? '#ffffff' : 'rgba(5,5,5,0.8)'}
-          stroke={isBeingKilled ? '#ff1a1a' : isBeingKnocked ? '#8a0303' : isKillerHere ? '#ff1a1a' : isSelected ? '#ffffff' : 'rgba(255,255,255,0.2)'}
-          strokeWidth={1}
+          x={-14} y={-11}
+          width={28} height={22}
+          fill={isBeingKilled ? '#0d0d0d' : '#ffffff'}
+          stroke="#0d0d0d"
+          strokeWidth="1.5"
         />
         <text
-          x={room.x + 19} y={room.y + 23}
+          x={0} y={5}
           textAnchor="middle"
-          fill={isBeingKilled ? '#ffffff' : isBeingKnocked ? '#ff1a1a' : isKillerHere ? '#ffffff' : isSelected ? '#050505' : 'rgba(255,255,255,0.7)'}
-          fontSize="11" fontFamily="monospace" fontWeight="bold"
+          fill={isBeingKilled ? '#ffffff' : '#0d0d0d'}
+          fontSize="14"
+          fontFamily="var(--font-bang), Impact"
+          fontWeight="bold"
         >
           {room.id}
         </text>
       </g>
 
-      {/* Room name label */}
-      <g>
+      {/* room name sticker */}
+      <g transform={`translate(${labelCx}, ${labelY}) rotate(-1.5)`}>
         <rect
-          x={labelCx - room.name.length * 3.5 - 6} y={labelCy - 8}
-          width={room.name.length * 7 + 12} height={16} rx={0}
-          fill="rgba(5,5,5,0.8)"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="0.5"
+          x={-roomNameLen * 4.2 - 8} y={-9}
+          width={roomNameLen * 8.4 + 16} height={18}
+          fill="#ffffff"
+          stroke="#0d0d0d"
+          strokeWidth="1.5"
         />
         <text
-          x={labelCx} y={labelCy + 4}
+          x={0} y={5}
           textAnchor="middle"
-          fill={isBeingKilled ? '#ff1a1a' : isBeingKnocked ? '#8a0303' : isKillerHere ? '#ff1a1a' : isSelected ? '#ffffff' : 'rgba(255,255,255,0.65)'}
-          fontSize="10" fontFamily="monospace" fontWeight="bold" letterSpacing="1"
+          fill="#0d0d0d"
+          fontSize="11"
+          fontFamily="var(--font-bang), Impact"
+          fontWeight="bold"
+          letterSpacing="1"
         >
           {room.name.toUpperCase()}
         </text>
       </g>
 
-      {/* Gambling bet pill */}
       {totalGambling > 0 && (
-        <g>
-          <rect
-            x={room.x + room.width - 56} y={room.y + room.height - 22}
-            width={50} height={16} rx={0}
-            fill="rgba(5,5,5,0.9)" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5"
-          />
+        <g transform={`translate(${room.x + room.width - 34}, ${room.y + 28}) rotate(6)`}>
+          <rect x={-28} y={-10} width={56} height={20} fill="#ffffff" stroke="#0d0d0d" strokeWidth="1.5" />
           <text
-            x={room.x + room.width - 31} y={room.y + room.height - 11}
-            textAnchor="middle" fill="#ffffff"
-            fontSize="8" fontFamily="monospace" fontWeight="bold"
+            x={0} y={5}
+            textAnchor="middle"
+            fill="#0d0d0d"
+            fontSize="10"
+            fontFamily="var(--font-bang), Impact"
+            fontWeight="bold"
           >
             {totalGambling} SOL
           </text>
         </g>
       )}
-      {/* Free prediction count pill */}
+
       {freeCount > 0 && (
-        <g>
-          <rect
-            x={room.x + 8} y={room.y + room.height - 22}
-            width={32} height={16} rx={0}
-            fill="rgba(5,5,5,0.9)" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5"
-          />
+        <g transform={`translate(${room.x + 42}, ${room.y + 18}) rotate(3)`}>
+          <rect x={-18} y={-10} width={36} height={20} fill="#ffffff" stroke="#0d0d0d" strokeWidth="1.5" />
           <text
-            x={room.x + 24} y={room.y + room.height - 11}
-            textAnchor="middle" fill="#ffffff"
-            fontSize="8" fontFamily="monospace" fontWeight="bold"
+            x={0} y={5}
+            textAnchor="middle"
+            fill="#0d0d0d"
+            fontSize="11"
+            fontFamily="var(--font-bang), Impact"
+            fontWeight="bold"
           >
-            {freeCount} 💀
+            {freeCount} 😭
           </text>
         </g>
       )}
 
-      {/* Player avatars in room */}
       {playersInRoom.map((player: any, index: number) => {
-        const avatarX = room.x + 15 + (index * 20)
-        const avatarY = room.y + 40
+        const avatarX = room.x + 15 + (index * 22)
+        const avatarY = room.y + 52
         const shortAddress = player.walletAddress ? player.walletAddress.slice(0, 4) + '...' + player.walletAddress.slice(-4) : '???'
-        
         return (
-          <g key={player.walletAddress || index}>
-            <circle
-              cx={avatarX}
-              cy={avatarY}
-              r={7}
-              fill="rgba(5,5,5,0.8)"
-              stroke="#ffffff"
-              strokeWidth={1}
-            />
-            <text
-              x={avatarX}
-              y={avatarY + 3}
-              textAnchor="middle"
-              fill="#ffffff"
-              fontSize="9"
-              fontWeight="bold"
-            >
-              👤
-            </text>
-            <rect
-              x={avatarX - 18}
-              y={avatarY + 12}
-              width={36}
-              height={10}
-              rx={0}
-              fill="rgba(5,5,5,0.9)"
-              stroke="rgba(255,255,255,0.2)"
-              strokeWidth="0.5"
-            />
-            <text
-              x={avatarX}
-              y={avatarY + 19}
-              textAnchor="middle"
-              fill="#ffffff"
-              fontSize="5"
-              fontFamily="monospace"
-              letterSpacing="0.5"
-            >
+          <g key={player.walletAddress || index} transform={`translate(${avatarX}, ${avatarY}) rotate(-3)`}>
+            <circle cx={0} cy={0} r={8} fill="#ffffff" stroke="#0d0d0d" strokeWidth="1.4" />
+            <text x={0} y={3} textAnchor="middle" fontSize="10">👤</text>
+            <rect x={-20} y={11} width={40} height={11} fill="#ffffff" stroke="#0d0d0d" strokeWidth="1" />
+            <text x={0} y={19} textAnchor="middle" fill="#0d0d0d" fontSize="6" fontFamily="monospace" letterSpacing="0.5">
               {shortAddress}
             </text>
           </g>
         )
       })}
 
-      {/* Knocking indicator — dark blood pulse on room border */}
       {isBeingKnocked && (
         <motion.rect
-          x={room.x + 2} y={room.y + 2}
-          width={room.width - 4} height={room.height - 4} rx={0}
-          fill="none" stroke="#8a0303" strokeWidth={2}
-          animate={{ opacity: [0.8, 0.2, 0.8] }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+          x={room.x + 4} y={room.y + 4}
+          width={room.width - 8} height={room.height - 8}
+          fill="none"
+          stroke="#0d0d0d"
+          strokeWidth="2.5"
+          strokeDasharray="4,5"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
         />
       )}
 
-      {/* Kill room — bright blood pulsing overlay with glitch */}
       {isBeingKilled && (
         <>
-          <motion.rect
+          <rect
             x={room.x + 2} y={room.y + 2}
-            width={room.width - 4} height={room.height - 4} rx={0}
-            fill="rgba(255,0,0,0.15)" stroke="#ff1a1a" strokeWidth={3}
-            animate={{ opacity: [0.8, 0.3, 0.9, 0.2, 0.8], fill: ['rgba(255,0,0,0.25)', 'rgba(255,0,0,0.05)', 'rgba(255,0,0,0.3)', 'rgba(255,0,0,0.05)', 'rgba(255,0,0,0.25)'] }}
-            transition={{ duration: 0.4, repeat: Infinity, ease: 'linear' }}
+            width={room.width - 4} height={room.height - 4}
+            fill="url(#crosshatch)"
+            opacity="0.7"
           />
-          {/* Screen shake effect text */}
-          <motion.text
-            x={labelCx} y={room.y + room.height - 30}
-            textAnchor="middle" fill="#ff1a1a"
-            fontSize="10" fontFamily="monospace" fontWeight="bold" letterSpacing="2"
-            animate={{ opacity: [1, 0.5, 1], x: [labelCx - 3, labelCx + 3, labelCx - 1, labelCx + 2, labelCx] }}
-            transition={{ duration: 0.2, repeat: Infinity }}
-            style={{ textShadow: '0 0 10px #ff1a1a' }}
-          >
-            FATALITY
-          </motion.text>
+          <g transform={`translate(${labelCx}, ${room.y + room.height / 2 - 40}) rotate(-12)`}>
+            <rect x={-52} y={-18} width={104} height={38} fill="#0d0d0d" stroke="#0d0d0d" strokeWidth="3" />
+            <text x={0} y={11} textAnchor="middle" fill="#ffffff" fontSize="26" fontFamily="var(--font-bang), Impact" fontWeight="bold" letterSpacing="4">
+              NGMI
+            </text>
+          </g>
         </>
       )}
 
-      {/* Already dead from previous kill step — dim static overlay */}
       {isAlreadyDead && gamePhase === 'killing' && (
         <>
           <rect
             x={room.x + 2} y={room.y + 2}
-            width={room.width - 4} height={room.height - 4} rx={0}
-            fill="rgba(60,0,0,0.4)" stroke="#4a0000" strokeWidth={1.5}
-            opacity={0.8}
+            width={room.width - 4} height={room.height - 4}
+            fill="url(#crosshatch)"
+            opacity="0.55"
           />
-          <text
-            x={labelCx} y={room.y + room.height - 30}
-            textAnchor="middle" fill="#6a0000"
-            fontSize="9" fontFamily="monospace" fontWeight="bold" letterSpacing="2"
-            opacity={0.7}
-          >
-            DEAD
-          </text>
+          <g transform={`translate(${labelCx}, ${room.y + room.height / 2 - 20}) rotate(-6)`} opacity="0.85">
+            <text x={0} y={0} textAnchor="middle" fill="#0d0d0d" fontSize="28" fontFamily="var(--font-bang), Impact" fontWeight="bold" letterSpacing="3">
+              REKT
+            </text>
+          </g>
         </>
       )}
 
-      {/* Surviving room — green glow pulse */}
       {isSurviving && (
         <>
           <motion.rect
             x={room.x + 2} y={room.y + 2}
-            width={room.width - 4} height={room.height - 4} rx={0}
-            fill="rgba(0,255,100,0.08)" stroke="#00ff66" strokeWidth={2}
-            animate={{ opacity: [0.9, 0.5, 0.9] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            width={room.width - 4} height={room.height - 4}
+            fill="rgba(13, 13, 13, 0.05)"
+            stroke="#0d0d0d"
+            strokeWidth="4"
+            strokeDasharray="8,4"
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
           />
-          <motion.text
-            x={labelCx} y={room.y + room.height - 30}
-            textAnchor="middle" fill="#00ff66"
-            fontSize="10" fontFamily="monospace" fontWeight="bold" letterSpacing="2"
-            animate={{ opacity: [1, 0.6, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
-            style={{ textShadow: '0 0 10px #00ff66' }}
+          <motion.g
+            transform={`translate(${labelCx}, ${room.y + room.height / 2 - 30}) rotate(-8)`}
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
           >
-            SURVIVED
-          </motion.text>
+            <rect x={-52} y={-20} width={104} height={40} fill="#ffffff" stroke="#0d0d0d" strokeWidth="3" />
+            <text x={0} y={12} textAnchor="middle" fill="#0d0d0d" fontSize="28" fontFamily="var(--font-bang), Impact" fontWeight="bold" letterSpacing="4">
+              GMI
+            </text>
+          </motion.g>
         </>
       )}
     </motion.g>

@@ -43,29 +43,21 @@ function GameInner() {
   }
 
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-void selection:bg-blood">
-      {/* Noise overlay */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] z-0 pointer-events-none mix-blend-overlay" />
-      
-      {/* Full screen house map background */}
+    <main className="relative h-screen w-screen overflow-hidden paper-bg paper-grain selection:bg-pepto">
       <div className="absolute inset-0 z-10">
         <HouseMap onRoomClick={handleRoomClick} />
       </div>
 
-      {/* Loading overlay */}
       <AnimatePresence mode="wait">
         {!sessionLoaded && <LoadingScreen key="loading" />}
       </AnimatePresence>
 
-      {/* Overlay UI */}
       <div className="absolute inset-0 pointer-events-none z-20 flex flex-col">
-        {/* Header overlay */}
         <div className="pointer-events-auto">
           <GameHeader />
         </div>
 
-        {/* Betting sidebar overlay - right side */}
-        <div className="absolute top-28 right-8 bottom-8 w-80 pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.9)]">
+        <div className="absolute top-28 right-6 bottom-6 w-80 pointer-events-auto">
           <BettingSidebar
             onOpenFreeBet={() => { setPreSelectedRoom(null); setFreeBetOpen(true) }}
             onOpenGambling={() => { setPreSelectedRoom(null); setGamblingOpen(true) }}
@@ -73,7 +65,6 @@ function GameInner() {
         </div>
       </div>
 
-      {/* Bet type chooser (shown on room click during betting only) */}
       <BetTypeChooser
         isOpen={chooserOpen}
         roomId={clickedRoom}
@@ -82,17 +73,13 @@ function GameInner() {
         onChooseGambling={handleChooseGambling}
       />
 
-      {/* Popups */}
       <FreeBetPopup isOpen={freeBetOpen} onClose={() => { setFreeBetOpen(false); setPreSelectedRoom(null) }} preSelectedRoom={preSelectedRoom} />
       <GamblingBetPopup isOpen={gamblingOpen} onClose={() => { setGamblingOpen(false); setPreSelectedRoom(null) }} preSelectedRoom={preSelectedRoom} />
 
-      {/* DevBuy notification toast */}
       <DevBuyToast />
 
-      {/* Chat sidebar - left side */}
       <ChatSidebar />
 
-      {/* Username picker popup - shown after loading if no username set */}
       <UsernamePopup
         isOpen={showUsernamePopup}
         onComplete={(name) => setUsername(name)}

@@ -1,21 +1,34 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
+import { Patrick_Hand, Bangers, Caveat_Brush, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { WalletContextProvider } from '@/components/WalletContextProvider'
 
-const spaceGrotesk = Space_Grotesk({ 
+const patrickHand = Patrick_Hand({
+  weight: '400',
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-hand',
 })
 
-const jetbrainsMono = JetBrains_Mono({ 
+const bangers = Bangers({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bang',
+})
+
+const caveat = Caveat_Brush({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-scribble',
+})
+
+const mono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
 })
 
 export const metadata: Metadata = {
-  title: '$HIDE',
-  description: 'Survive the night by picking room. Solana-powered betting game.',
+  title: '$UncKiller — Unc Is Coming For You',
+  description: 'Pick a room. Pray Unc skips yours. Solana-powered wojak survival.',
 }
 
 export default function RootLayout({
@@ -24,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-display bg-noise bg-void text-horror-text selection:bg-blood selection:text-white antialiased">
+    <html lang="en" className={`${patrickHand.variable} ${bangers.variable} ${caveat.variable} ${mono.variable}`}>
+      <body className="font-hand paper-bg paper-grain text-ink antialiased">
         <WalletContextProvider>
           {children}
         </WalletContextProvider>

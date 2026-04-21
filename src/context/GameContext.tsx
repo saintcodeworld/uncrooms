@@ -98,13 +98,13 @@ interface GameContextType extends GameState {
 }
 
 const BETTABLE_ROOMS: Room[] = [
-  { id: 1, name: 'Master Bedroom', x: 40, y: 40, width: 220, height: 180, freeBets: [], gamblingBets: [] },
-  { id: 2, name: 'Bedroom 2', x: 40, y: 240, width: 180, height: 160, freeBets: [], gamblingBets: [] },
-  { id: 3, name: 'Bedroom 3', x: 40, y: 420, width: 180, height: 140, freeBets: [], gamblingBets: [] },
-  { id: 4, name: 'Study', x: 500, y: 40, width: 180, height: 160, freeBets: [], gamblingBets: [] },
-  { id: 5, name: 'Master Bath', x: 280, y: 40, width: 200, height: 130, freeBets: [], gamblingBets: [] },
-  { id: 6, name: 'Bathroom 2', x: 500, y: 220, width: 180, height: 120, freeBets: [], gamblingBets: [] },
-  { id: 7, name: 'Kitchen', x: 500, y: 360, width: 180, height: 200, freeBets: [], gamblingBets: [] },
+  { id: 1, name: "Unc's Lair", x: 40, y: 40, width: 220, height: 180, freeBets: [], gamblingBets: [] },
+  { id: 2, name: 'Coper Bunk', x: 40, y: 240, width: 180, height: 160, freeBets: [], gamblingBets: [] },
+  { id: 3, name: 'Mom Basement', x: 40, y: 420, width: 180, height: 140, freeBets: [], gamblingBets: [] },
+  { id: 4, name: 'Trading Desk', x: 500, y: 40, width: 180, height: 160, freeBets: [], gamblingBets: [] },
+  { id: 5, name: 'Crying Tub', x: 280, y: 40, width: 200, height: 130, freeBets: [], gamblingBets: [] },
+  { id: 6, name: 'Cope Closet', x: 500, y: 220, width: 180, height: 120, freeBets: [], gamblingBets: [] },
+  { id: 7, name: 'Pizza Den', x: 500, y: 360, width: 180, height: 200, freeBets: [], gamblingBets: [] },
 ]
 
 const buildInitialRooms = (): Room[] => [

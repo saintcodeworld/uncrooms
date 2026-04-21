@@ -2,11 +2,27 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 interface UsernamePopupProps {
   isOpen: boolean
   onComplete: (username: string) => void
+}
+
+function WojakFace() {
+  return (
+    <svg viewBox="0 0 80 80" className="w-14 h-14" aria-label="wojak">
+      <circle cx={40} cy={40} rx={30} ry={32} fill="#fbd4bc" stroke="#0d0d0d" strokeWidth="2.5" />
+      <circle cx={40} cy={40} r={32} fill="#fbd4bc" stroke="#0d0d0d" strokeWidth="2.5" />
+      <path d="M 14 36 Q 40 28 66 36" fill="none" stroke="#2a1a10" strokeWidth="2" opacity="0.5" />
+      <circle cx={30} cy={40} r={2.6} fill="#0d0d0d" />
+      <circle cx={50} cy={40} r={2.6} fill="#0d0d0d" />
+      <circle cx={24} cy={48} r={3.5} fill="#ff7aa4" opacity="0.6" />
+      <circle cx={56} cy={48} r={3.5} fill="#ff7aa4" opacity="0.6" />
+      <path d="M 32 54 Q 40 50 48 54" fill="none" stroke="#0d0d0d" strokeWidth="1.8" strokeLinecap="round" />
+      <ellipse cx={28} cy={46} rx={1.3} ry={2.4} fill="#8fc8f2" stroke="#0d0d0d" strokeWidth="0.7" />
+    </svg>
+  )
 }
 
 export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
@@ -16,26 +32,14 @@ export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 400)
-    }
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 400)
   }, [isOpen])
 
   const handleSubmit = async () => {
     const trimmed = username.trim()
-    if (trimmed.length < 2) {
-      setError('At least 2 characters')
-      return
-    }
-    if (trimmed.length > 20) {
-      setError('Max 20 characters')
-      return
-    }
-    // Only allow alphanumeric, underscores, dashes
-    if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
-      setError('Letters, numbers, _ and - only')
-      return
-    }
+    if (trimmed.length < 2) { setError('at least 2 chars'); return }
+    if (trimmed.length > 20) { setError('max 20 chars'); return }
+    if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) { setError('letters, numbers, _ and - only'); return }
 
     setError('')
     setIsSubmitting(true)
@@ -52,19 +56,14 @@ export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, username: trimmed }),
       })
-
       const data = await res.json()
 
-      if (!res.ok) {
-        setError(data.error || 'Failed to save username')
-        setIsSubmitting(false)
-        return
-      }
+      if (!res.ok) { setError(data.error || 'failed to save'); setIsSubmitting(false); return }
 
       localStorage.setItem('hide_username', trimmed)
       onComplete(trimmed)
     } catch (err) {
-      setError('Connection error, try again')
+      setError('connection error, try again')
       setIsSubmitting(false)
     }
   }
@@ -83,53 +82,41 @@ export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-void/95 backdrop-blur-md"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4"
         >
-          {/* Background effects */}
-          <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(138,3,3,0.08)_0%,transparent_70%)] pointer-events-none" />
-
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="relative w-full max-w-sm mx-4"
+            initial={{ scale: 0.9, opacity: 0, rotate: -2, y: 20 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, rotate: 2, y: 20 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="relative w-full max-w-sm"
           >
-            <div className="border border-void-border bg-void/95 backdrop-blur-xl shadow-[0_0_60px_rgba(0,0,0,0.9)] relative overflow-hidden">
-              {/* Top accent line */}
-              <div className="absolute top-0 left-0 w-full h-[1px] bg-blood-glow opacity-50" />
-
-              {/* Header */}
-              <div className="px-6 pt-8 pb-4 flex flex-col items-center gap-4">
-                <div className="w-14 h-14 border border-blood/30 bg-blood-dark/20 flex items-center justify-center">
-                  <User className="w-7 h-7 text-blood-glow" />
+            <div className="border-[3px] border-ink bg-white shadow-doodle-lg font-hand">
+              <div className="px-6 pt-7 pb-4 flex flex-col items-center gap-3">
+                <div className="border-[3px] border-ink bg-white p-2 shadow-doodle">
+                  <WojakFace />
                 </div>
                 <div className="text-center">
-                  <h2 className="text-white font-bold text-sm tracking-[0.25em] uppercase font-display">
-                    CHOOSE YOUR NAME
+                  <h2 className="font-bang text-2xl text-ink tracking-wider leading-none">
+                    WHO IS U
                   </h2>
-                  <p className="text-horror-muted text-[10px] font-mono mt-2 lowercase tracking-widest">
-                    how shall the dead know you?
+                  <p className="font-hand text-sm text-ink/70 mt-1">
+                    pick a name. unc keeps the list.
                   </p>
                 </div>
               </div>
 
-              {/* Input */}
-              <div className="px-6 pb-6 space-y-4">
+              <div className="px-6 pb-6 space-y-3">
                 <div className="space-y-2">
                   <input
                     ref={inputRef}
                     type="text"
                     value={username}
-                    onChange={(e) => {
-                      setUsername(e.target.value)
-                      setError('')
-                    }}
+                    onChange={(e) => { setUsername(e.target.value); setError('') }}
                     onKeyDown={handleKeyDown}
-                    placeholder="Enter username..."
+                    placeholder="enter name..."
                     maxLength={20}
-                    className="w-full bg-void border border-void-border text-white text-sm font-mono px-4 py-3 placeholder:text-horror-muted/50 focus:outline-none focus:border-blood/50 transition-colors tracking-wider text-center uppercase"
+                    className="w-full bg-white border-[3px] border-ink text-ink font-hand text-lg px-4 py-3 placeholder:text-ink/30 focus:outline-none focus:bg-paper transition text-center"
                   />
                   {error && (
                     <motion.div
@@ -137,10 +124,8 @@ export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex items-center justify-center gap-1.5"
                     >
-                      <AlertCircle className="w-3 h-3 text-blood-glow" />
-                      <span className="text-blood-glow text-[10px] font-mono tracking-wider uppercase">
-                        {error}
-                      </span>
+                      <AlertCircle className="w-3.5 h-3.5 text-ink" />
+                      <span className="font-hand text-sm text-ink">{error}</span>
                     </motion.div>
                   )}
                 </div>
@@ -148,22 +133,19 @@ export function UsernamePopup({ isOpen, onComplete }: UsernamePopupProps) {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting || username.trim().length < 2}
-                  className="w-full py-3 border border-blood/40 bg-blood-dark/20 text-white font-bold text-[11px] tracking-[0.25em] uppercase font-display hover:bg-blood-dark/40 hover:border-blood-glow hover:shadow-[0_0_15px_rgba(138,3,3,0.3)] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-full py-3 border-[3px] border-ink bg-white font-bang text-ink text-xl tracking-wider shadow-doodle hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-doodle-lg hover:bg-ink hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
-                    <motion.span
-                      animate={{ opacity: [1, 0.4, 1] }}
-                      transition={{ duration: 0.8, repeat: Infinity }}
-                    >
+                    <motion.span animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 0.8, repeat: Infinity }}>
                       ENTERING...
                     </motion.span>
                   ) : (
-                    'ENTER THE HOUSE'
+                    'ENTER UNC HOUSE'
                   )}
                 </button>
 
-                <p className="text-horror-muted/40 text-[8px] font-mono text-center tracking-widest uppercase">
-                  2-20 characters &middot; letters, numbers, _ -
+                <p className="font-hand text-xs text-ink/50 text-center">
+                  2-20 chars · letters, numbers, _ -
                 </p>
               </div>
             </div>
