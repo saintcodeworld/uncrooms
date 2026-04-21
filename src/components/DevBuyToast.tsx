@@ -13,7 +13,7 @@ export function DevBuyToast() {
   useEffect(() => {
     if (gamePhase === 'result' && roundResult) {
       if (roundResult.devBuyAmount > 0) {
-        setMessage(`COPE BUY: ${roundResult.devBuyAmount} SOL`)
+        setMessage(`cope buy: ${roundResult.devBuyAmount} sol`)
         setShow(true)
         const timer = setTimeout(() => setShow(false), 6000)
         return () => clearTimeout(timer)

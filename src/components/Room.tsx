@@ -19,13 +19,14 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
   const isActiveKill = gamePhase === 'killing' && isKilling && killStep >= 0 && killStep < killSequence.length && killSequence[killStep]?.roomId === room.id
   const isAlreadyDead = isRoomKilled(room.id) && !isActiveKill
   const isBeingKilled = isActiveKill
-  const isSurviving = survivingRoom === room.id && gamePhase === 'result'
+  // Winner UI only after all eliminations (result phase), not while kills are still playing out
+  const isWinnerRoom = survivingRoom === room.id && gamePhase === 'result'
   const canClick = gamePhase === 'betting'
 
   const playersInRoom = playerPositions.filter((p: any) => p.roomId === room.id)
 
-  const overlayFill = isSurviving
-    ? 'rgba(13, 13, 13, 0.06)'
+  const overlayFill = isWinnerRoom
+    ? 'rgba(34, 197, 94, 0.1)'
     : isActiveKill
     ? 'rgba(232, 51, 51, 0.25)'
     : isAlreadyDead
@@ -40,8 +41,8 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
 
   const hoverFill = canClick ? 'rgba(13, 13, 13, 0.05)' : overlayFill
 
-  const borderColor = isSurviving
-    ? '#0d0d0d'
+  const borderColor = isWinnerRoom
+    ? '#22c55e'
     : isActiveKill
     ? '#e83333'
     : isAlreadyDead
@@ -57,6 +58,13 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
   const labelCx = room.x + room.width / 2
   const labelY = room.y + room.height - 18
   const roomNameLen = room.name.length
+
+  const elimPad = Math.max(10, Math.min(room.width, room.height) * 0.08)
+  const elimStrokeW = Math.max(5, Math.min(room.width, room.height) * 0.09)
+  const elimX1 = room.x + elimPad
+  const elimY1 = room.y + elimPad
+  const elimX2 = room.x + room.width - elimPad
+  const elimY2 = room.y + room.height - elimPad
 
   return (
     <motion.g
@@ -74,7 +82,7 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
         width={room.width - 4} height={room.height - 4}
         fill={overlayFill}
         stroke={borderColor}
-        strokeWidth={isSelected || isKillerHere || isBeingKnocked || isBeingKilled ? 3 : 0}
+        strokeWidth={isSelected || isKillerHere || isBeingKnocked || isBeingKilled || isWinnerRoom ? 3 : 0}
         strokeDasharray={isSelected ? '6,4' : '0'}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -121,7 +129,7 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
           fontWeight="bold"
           letterSpacing="1"
         >
-          {room.name.toUpperCase()}
+          {room.name}
         </text>
       </g>
 
@@ -219,27 +227,62 @@ export function Room({ room, isSelected, onClick }: RoomProps) {
         </>
       )}
 
-      {isSurviving && (
+      {isRoomKilled(room.id) && (
+        <motion.g
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+          style={{ pointerEvents: 'none' }}
+        >
+          <line x1={elimX1} y1={elimY1} x2={elimX2} y2={elimY2} stroke="#ffffff" strokeWidth={elimStrokeW + 3} strokeLinecap="round" opacity={0.35} />
+          <line x1={elimX2} y1={elimY1} x2={elimX1} y2={elimY2} stroke="#ffffff" strokeWidth={elimStrokeW + 3} strokeLinecap="round" opacity={0.35} />
+          <line x1={elimX1} y1={elimY1} x2={elimX2} y2={elimY2} stroke="#e83333" strokeWidth={elimStrokeW} strokeLinecap="round" />
+          <line x1={elimX2} y1={elimY1} x2={elimX1} y2={elimY2} stroke="#e83333" strokeWidth={elimStrokeW} strokeLinecap="round" />
+        </motion.g>
+      )}
+
+      {isWinnerRoom && (
         <>
           <motion.rect
             x={room.x + 2} y={room.y + 2}
             width={room.width - 4} height={room.height - 4}
-            fill="rgba(13, 13, 13, 0.05)"
-            stroke="#0d0d0d"
+            fill="rgba(34, 197, 94, 0.08)"
+            stroke="#22c55e"
             strokeWidth="4"
             strokeDasharray="8,4"
-            animate={{ opacity: [0.6, 1, 0.6] }}
+            animate={{ opacity: [0.65, 1, 0.65] }}
             transition={{ duration: 1.2, repeat: Infinity }}
           />
           <motion.g
             transform={`translate(${labelCx}, ${room.y + room.height / 2 - 30}) rotate(-8)`}
-            animate={{ scale: [1, 1.08, 1] }}
+            animate={{ scale: [1, 1.06, 1] }}
             transition={{ duration: 1.2, repeat: Infinity }}
           >
-            <rect x={-52} y={-20} width={104} height={40} fill="#ffffff" stroke="#0d0d0d" strokeWidth="3" />
-            <text x={0} y={12} textAnchor="middle" fill="#0d0d0d" fontSize="28" fontFamily="var(--font-bang), Impact" fontWeight="bold" letterSpacing="4">
-              GMI
-            </text>
+            <rect x={-88} y={-24} width={176} height={48} fill="#ffffff" stroke="#22c55e" strokeWidth="3" />
+            <g transform="translate(-6, 0)">
+              <text
+                x={-26}
+                y={14}
+                textAnchor="middle"
+                fill="#16a34a"
+                fontSize="36"
+                fontFamily="var(--font-bang), Impact"
+                fontWeight="bold"
+                letterSpacing="6"
+              >
+                WIN
+              </text>
+              <g transform="translate(32, 2)">
+                <path
+                  d="M -14 2 L -4 14 L 22 -12"
+                  fill="none"
+                  stroke="#16a34a"
+                  strokeWidth="5.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </g>
           </motion.g>
         </>
       )}

@@ -44,7 +44,7 @@ export function GameHeader() {
 
           <div className="flex items-center gap-2">
             <a
-              href="https://x.com/i/communities/2031839433255751684"
+              href="https://x.com/unchousekiller"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:inline-flex items-center gap-2 border-[3px] border-ink bg-white px-3 py-2 font-bang text-sm tracking-wider shadow-doodle hover:-translate-y-0.5 hover:bg-ink hover:text-white transition-all"

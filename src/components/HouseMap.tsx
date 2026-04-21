@@ -231,12 +231,6 @@ export function HouseMap({ onRoomClick }: HouseMapProps) {
                 <text x={605} y={505} textAnchor="middle" fontSize="16" fontFamily="var(--font-hand)" stroke="none">😭</text>
               </g>
 
-              {/* hallway portrait of unc */}
-              <g transform="rotate(-6 445 400)">
-                <rect x={428} y={378} width={34} height={42} fill="#ffffff" />
-                <image href="/unc.png" x={431} y={381} width={28} height={36} preserveAspectRatio="xMidYMid meet" />
-              </g>
-              <text x={445} y={434} textAnchor="middle" fontSize="7" fontFamily="var(--font-bang), Impact" fill="#0d0d0d" stroke="none">UNC</text>
             </g>
 
             {/* doors as arcs */}

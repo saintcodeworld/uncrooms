@@ -27,7 +27,7 @@ const mono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: '$UncKiller — Unc Is Coming For You',
+  title: 'unc house killer',
   description: 'Pick a room. Pray Unc skips yours. Solana-powered wojak survival.',
 }
 
